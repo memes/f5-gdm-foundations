@@ -1,8 +1,9 @@
 # spell-checker: ignore fileignoreconfig
 ---
 fileignoreconfig:
-- filename: .github/workflows/release.yml
-  checksum: be3e0d4c7edcb374e48a402fb87c08b86fe49e4f89bbdf1e04bd8d14492abec6
-# Remove after rename
-- filename: dotenvrc
-  checksum: 87d87144f4f6412e13b3706d4ed4b236c5bb337abc79d1bd984555a2d2fa9624
+- filename: .terraform.lock.hcl
+  checksum: 934aba61b3247c3a593e14d5f0865eb5da9be9fd18cbc258dea428ec5d57d800
+- filename: variables.tf
+  checksum: 9c490f6ef538e97851a1190623cdc514bcce34211c60176390d88789403f06fd
+- filename: README.md
+  checksum: 85d8203163fe6661cfdafaf9e1df46496e9a0b3f65d730f6b7ed4bcf345e8ac8
