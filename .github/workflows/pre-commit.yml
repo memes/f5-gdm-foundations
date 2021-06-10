@@ -1,0 +1,31 @@
+# These github actions will update Terraform section(s) of README(s), and
+# perform linting using pre-commit.
+# spell-checker: ignore yamllint chmod hashlib
+# yamllint disable rule:line-length
+---
+name: pre-commit
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install terraform-docs
+        run: |
+          sudo curl -sLo /usr/local/bin/terraform-docs https://github.com/segmentio/terraform-docs/releases/download/v0.12.1/terraform-docs-v0.12.1-linux-amd64
+          sudo chmod 0755 /usr/local/bin/terraform-docs
+      - uses: actions/setup-python@v2
+      - uses: pre-commit/action@v2.0.0
+  hadolint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: brpaz/hadolint-action@v1.4.0
+        with:
+          dockerfile: "Dockerfile"
