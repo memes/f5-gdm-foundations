@@ -79,3 +79,15 @@ variable "vpcs" {
 Sets the CIDRs and subnet sizes for each VPC.
 EOD
 }
+
+variable "service_accounts" {
+  type = set(string)
+  default = [
+    "gdm-bigip",
+    "gdm-cfe-bigip",
+  ]
+  description = <<EOD
+A set of names for which a generated service account will be created; any name
+that contains '-cfe-' will be granted a custom CFE role in the project.
+EOD
+}
