@@ -14,19 +14,17 @@ provider "google" {
   impersonate_service_account = var.tf_sa_email
 }
 
+locals {
+  cfe_service_accounts = [for sa in var.service_accounts : sa if length(regexall("-cfe-", sa)) > 0]
+}
+
 module "service_accounts" {
-  source     = "terraform-google-modules/service-accounts/google"
-  version    = "4.0.0"
-  project_id = var.project_id
-  prefix     = var.prefix
-  names = [
-    "gdm-bigip",
-    "gdm-cfe-bigip",
-  ]
-  descriptions = [
-    format("GDM BIG-IP service account (%s)", var.prefix),
-    format("GDM BIG-IP service account with CFE role (%s)", var.prefix),
-  ]
+  source      = "terraform-google-modules/service-accounts/google"
+  version     = "4.0.0"
+  project_id  = var.project_id
+  prefix      = var.prefix
+  names       = var.service_accounts
+  description = format("GDM BIG-IP service account (%s)", var.prefix)
   project_roles = [
     "${var.project_id}=>roles/logging.logWriter",
     "${var.project_id}=>roles/monitoring.metricWriter",
@@ -36,13 +34,12 @@ module "service_accounts" {
 }
 
 module "cfe_role" {
+  count       = length(local.cfe_service_accounts) > 0 ? 1 : 0
   source      = "memes/f5-bigip/google//modules/cfe-role"
   version     = "2.1.0"
   target_type = "project"
   target_id   = var.project_id
-  members = [
-    format("serviceAccount:%s-gdm-cfe-bigip@%s.iam.gserviceaccount.com", var.prefix, var.project_id)
-  ]
+  members     = formatlist("serviceAccount:%s-%s@%s.iam.gserviceaccount.com", var.prefix, local.cfe_service_accounts, var.project_id)
 }
 
 locals {
@@ -52,7 +49,7 @@ locals {
 }
 
 module "vpcs" {
-  for_each                               = var.vpcs
+  for_each                               = { for k, v in var.vpcs : k => v if v != null }
   source                                 = "terraform-google-modules/network/google"
   version                                = "3.3.0"
   project_id                             = var.project_id
