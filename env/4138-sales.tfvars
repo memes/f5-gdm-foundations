@@ -5,3 +5,4 @@ labels = {
   owner     = "emes"
   retention = "none"
 }
+regions = ["us-west1", "us-central1", "europe-west3"]
