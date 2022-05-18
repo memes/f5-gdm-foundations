@@ -9,24 +9,26 @@ Setup Service Accounts and VPCs for testing GDM templates.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 3.71 |
-
-## Providers
-
-No providers.
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 4.0  |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_bastion"></a> [bastion](#module\_bastion) | memes/private-bastion/google | 2.0.0 |
 | <a name="module_cfe_role"></a> [cfe\_role](#module\_cfe\_role) | memes/f5-bigip/google//modules/cfe-role | 2.1.0 |
-| <a name="module_service_accounts"></a> [service\_accounts](#module\_service\_accounts) | terraform-google-modules/service-accounts/google | 4.0.0 |
-| <a name="module_vpcs"></a> [vpcs](#module\_vpcs) | terraform-google-modules/network/google | 3.3.0 |
+| <a name="module_cloud_router"></a> [cloud\_router](#module\_cloud\_router) | terraform-google-modules/cloud-router/google | 1.3.0 |
+| <a name="module_password"></a> [password](#module\_password) | memes/secret-manager/google//modules/random | 1.1.1 |
+| <a name="module_service_accounts"></a> [service\_accounts](#module\_service\_accounts) | terraform-google-modules/service-accounts/google | 4.1.1 |
+| <a name="module_vpcs"></a> [vpcs](#module\_vpcs) | terraform-google-modules/network/google | 5.0.0 |
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [google_project_iam_member.gdm_iam_admin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project.project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 
 ## Inputs
 
@@ -38,7 +40,7 @@ No resources.
 | <a name="input_regions"></a> [regions](#input\_regions) | A list of Compute regions where the VPC subnets will be created. | `list(string)` | <pre>[<br>  "us-west1",<br>  "us-central1"<br>]</pre> | no |
 | <a name="input_service_accounts"></a> [service\_accounts](#input\_service\_accounts) | A set of names for which a generated service account will be created; any name<br>that contains '-cfe-' will be granted a custom CFE role in the project. | `set(string)` | <pre>[<br>  "gdm-bigip",<br>  "gdm-cfe-bigip"<br>]</pre> | no |
 | <a name="input_tf_sa_email"></a> [tf\_sa\_email](#input\_tf\_sa\_email) | The fully-qualified email address of the Terraform service account to use for<br>resource creation. E.g.<br>tf\_sa\_email = "terraform@PROJECT\_ID.iam.gserviceaccount.com" | `string` | `""` | no |
-| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | Sets the CIDRs and subnet sizes for each VPC. | <pre>object({<br>    external = object({<br>      cidr        = string<br>      subnet_size = number<br>      mtu         = number<br>    })<br>    management = object({<br>      cidr        = string<br>      subnet_size = number<br>      mtu         = number<br>    })<br>    internal = object({<br>      cidr        = string<br>      subnet_size = number<br>      mtu         = number<br>    })<br>  })</pre> | <pre>{<br>  "external": {<br>    "cidr": "172.16.0.0/16",<br>    "mtu": 1460,<br>    "subnet_size": 24<br>  },<br>  "internal": {<br>    "cidr": "172.18.0.0/16",<br>    "mtu": 1460,<br>    "subnet_size": 24<br>  },<br>  "management": {<br>    "cidr": "172.17.0.0/16",<br>    "mtu": 1460,<br>    "subnet_size": 24<br>  }<br>}</pre> | no |
+| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | Sets the CIDRs and subnet sizes for each VPC. | <pre>object({<br>    external = object({<br>      cidr        = string<br>      subnet_size = number<br>      mtu         = number<br>      nat         = bool<br>      bastion     = bool<br>    })<br>    management = object({<br>      cidr        = string<br>      subnet_size = number<br>      mtu         = number<br>      nat         = bool<br>      bastion     = bool<br>    })<br>    internal = object({<br>      cidr        = string<br>      subnet_size = number<br>      mtu         = number<br>      nat         = bool<br>      bastion     = bool<br>    })<br>  })</pre> | <pre>{<br>  "external": {<br>    "bastion": false,<br>    "cidr": "172.16.0.0/16",<br>    "mtu": 1460,<br>    "nat": true,<br>    "subnet_size": 24<br>  },<br>  "internal": {<br>    "bastion": false,<br>    "cidr": "172.18.0.0/16",<br>    "mtu": 1460,<br>    "nat": false,<br>    "subnet_size": 24<br>  },<br>  "management": {<br>    "bastion": true,<br>    "cidr": "172.17.0.0/16",<br>    "mtu": 1460,<br>    "nat": true,<br>    "subnet_size": 24<br>  }<br>}</pre> | no |
 
 ## Outputs
 

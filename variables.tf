@@ -46,16 +46,22 @@ variable "vpcs" {
       cidr        = string
       subnet_size = number
       mtu         = number
+      nat         = bool
+      bastion     = bool
     })
     management = object({
       cidr        = string
       subnet_size = number
       mtu         = number
+      nat         = bool
+      bastion     = bool
     })
     internal = object({
       cidr        = string
       subnet_size = number
       mtu         = number
+      nat         = bool
+      bastion     = bool
     })
   })
   default = {
@@ -63,16 +69,22 @@ variable "vpcs" {
       cidr        = "172.16.0.0/16"
       subnet_size = 24
       mtu         = 1460
+      nat         = true
+      bastion     = false
     }
     management = {
       cidr        = "172.17.0.0/16"
       subnet_size = 24
       mtu         = 1460
+      nat         = true
+      bastion     = true
     }
     internal = {
       cidr        = "172.18.0.0/16"
       subnet_size = 24
       mtu         = 1460
+      nat         = false
+      bastion     = false
     }
   }
   description = <<EOD
