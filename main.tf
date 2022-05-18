@@ -91,13 +91,27 @@ module "cloud_router" {
   }]
 }
 
+resource "random_string" "password" {
+  length           = 16
+  upper            = true
+  min_upper        = 2
+  lower            = true
+  min_lower        = 2
+  number           = true
+  min_numeric      = 2
+  special          = true
+  min_special      = 2
+  override_special = "!@#$%&*()-_=+[]{}<>:?"
+}
+
 # CST 2.0 templates have support for secret manager; create a random password as
 # versioned secret.
 module "password" {
-  source     = "memes/secret-manager/google//modules/random"
-  version    = "1.1.1"
+  source     = "memes/secret-manager/google"
+  version    = "2.0.0"
   project_id = var.project_id
   id         = format("%s-gdm-bigip-password", var.prefix)
+  secret     = random_string.password.result
 }
 
 # CST 2.0 templates create roles as needed; make sure the GCP Agent service account

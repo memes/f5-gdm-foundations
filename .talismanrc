@@ -6,4 +6,6 @@ fileignoreconfig:
 - filename: variables.tf
   checksum: 9c490f6ef538e97851a1190623cdc514bcce34211c60176390d88789403f06fd
 - filename: README.md
-  checksum: ab5058c0199f91a4d90c980ac8e14d40e9651beb5ac7ed373dfbc8ef938daaf6
+  checksum: 2f133fe7f4afe061bf5f42fcbff369b90c62388b2ae69db1882d5697258f01d4
+- filename: main.tf
+  checksum: 23b1d8c36f356d46dc7be7883d553d2747cabaa248fb7c5c7c2a1f0399739523

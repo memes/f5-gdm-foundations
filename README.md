@@ -19,7 +19,7 @@ Setup Service Accounts and VPCs for testing GDM templates.
 | <a name="module_bastion"></a> [bastion](#module\_bastion) | memes/private-bastion/google | 2.0.0 |
 | <a name="module_cfe_role"></a> [cfe\_role](#module\_cfe\_role) | memes/f5-bigip/google//modules/cfe-role | 2.1.0 |
 | <a name="module_cloud_router"></a> [cloud\_router](#module\_cloud\_router) | terraform-google-modules/cloud-router/google | 1.3.0 |
-| <a name="module_password"></a> [password](#module\_password) | memes/secret-manager/google//modules/random | 1.1.1 |
+| <a name="module_password"></a> [password](#module\_password) | memes/secret-manager/google | 2.0.0 |
 | <a name="module_service_accounts"></a> [service\_accounts](#module\_service\_accounts) | terraform-google-modules/service-accounts/google | 4.1.1 |
 | <a name="module_vpcs"></a> [vpcs](#module\_vpcs) | terraform-google-modules/network/google | 5.0.0 |
 
@@ -28,6 +28,7 @@ Setup Service Accounts and VPCs for testing GDM templates.
 | Name | Type |
 |------|------|
 | [google_project_iam_member.gdm_iam_admin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [random_string.password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [google_project.project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 
 ## Inputs
