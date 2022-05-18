@@ -95,7 +95,7 @@ module "cloud_router" {
 # versioned secret.
 module "password" {
   source     = "memes/secret-manager/google//modules/random"
-  version    = "1.1.1"
+  version    = "2.0.0"
   project_id = var.project_id
   id         = format("%s-gdm-bigip-password", var.prefix)
 }
