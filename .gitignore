@@ -1,11 +1,13 @@
 # Ignore my direnv setup
 .envrc
 .direnv
+.tool-versions
 
 # Ignore Terraform plugin/module cache and local state files
 .terraform
 *.tfstate
 *.tfstate.*
+.terraform.lock.hcl
 
 # Don't include any local automatic variable assignment files
 terraform.tfvars
