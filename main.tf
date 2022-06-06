@@ -3,7 +3,11 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = ">= 4.0 "
+      version = ">= 4.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.3"
     }
   }
   # Set the bucket and path in .config file
@@ -97,7 +101,7 @@ resource "random_string" "password" {
   min_upper        = 2
   lower            = true
   min_lower        = 2
-  number           = true
+  numeric          = true
   min_numeric      = 2
   special          = true
   min_special      = 2

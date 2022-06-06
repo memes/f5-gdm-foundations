@@ -10,7 +10,8 @@ Setup Service Accounts and VPCs for testing GDM templates.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | >= 4.0  |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 4.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.3 |
 
 ## Modules
 
@@ -18,10 +19,10 @@ Setup Service Accounts and VPCs for testing GDM templates.
 |------|--------|---------|
 | <a name="module_bastion"></a> [bastion](#module\_bastion) | memes/private-bastion/google | 2.0.1 |
 | <a name="module_cfe_role"></a> [cfe\_role](#module\_cfe\_role) | memes/f5-bigip/google//modules/cfe-role | 2.1.0 |
-| <a name="module_cloud_router"></a> [cloud\_router](#module\_cloud\_router) | terraform-google-modules/cloud-router/google | 1.3.0 |
+| <a name="module_cloud_router"></a> [cloud\_router](#module\_cloud\_router) | terraform-google-modules/cloud-router/google | 2.0.0 |
 | <a name="module_password"></a> [password](#module\_password) | memes/secret-manager/google | 2.0.1 |
 | <a name="module_service_accounts"></a> [service\_accounts](#module\_service\_accounts) | terraform-google-modules/service-accounts/google | 4.1.1 |
-| <a name="module_vpcs"></a> [vpcs](#module\_vpcs) | terraform-google-modules/network/google | 5.0.0 |
+| <a name="module_vpcs"></a> [vpcs](#module\_vpcs) | terraform-google-modules/network/google | 5.1.0 |
 
 ## Resources
 
