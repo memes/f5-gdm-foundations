@@ -84,7 +84,7 @@ module "cloud_router" {
     network = module.vpcs[pair[1]].network_self_link
   } }
   source  = "terraform-google-modules/cloud-router/google"
-  version = "2.0.0"
+  version = "3.0.0"
   project = var.project_id
   name    = each.value.name
   network = each.value.network
