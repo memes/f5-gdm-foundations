@@ -61,7 +61,7 @@ locals {
 module "vpcs" {
   for_each                               = { for k, v in var.vpcs : k => v if v != null }
   source                                 = "terraform-google-modules/network/google"
-  version                                = "5.1.0"
+  version                                = "5.2.0"
   project_id                             = var.project_id
   network_name                           = format("%s-gdm-%s", var.prefix, each.key)
   description                            = format("%s VPC for GDM testing (%s)", var.prefix, title(each.key))
