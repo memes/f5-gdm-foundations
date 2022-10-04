@@ -13,11 +13,15 @@ vpcs = {
     cidr        = "172.17.0.0/16"
     subnet_size = 24
     mtu         = 1460
+    bastion     = false
+    nat         = false
   }
   internal = {
     cidr        = "172.18.0.0/16"
     subnet_size = 24
     mtu         = 1460
+    bastion     = false
+    nat         = false
   }
 }
 # Only create a non-CFE service account in service project
