@@ -141,7 +141,7 @@ module "bastion" {
   prefix                = each.value.prefix
   subnet                = each.value.subnet
   zone                  = each.value.zone
-  proxy_container_image = "us-docker.pkg.dev/f5-gcs-4138-sales-cloud-sales/emes-auto-fact-container/forward-proxy:1.0.0-memes"
+  proxy_container_image = "us-docker.pkg.dev/f5-gcs-4138-sales-cloud-sales/automation-factory-container/memes/terraform-google-private-bastion/forward-proxy:2.1.0"
   bastion_targets = {
     service_accounts = null
     cidrs            = each.value.cidrs
