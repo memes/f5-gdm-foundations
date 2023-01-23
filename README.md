@@ -22,7 +22,7 @@ Setup Service Accounts and VPCs for testing GDM templates.
 | <a name="module_cloud_router"></a> [cloud\_router](#module\_cloud\_router) | terraform-google-modules/cloud-router/google | 4.0.0 |
 | <a name="module_password"></a> [password](#module\_password) | memes/secret-manager/google | 2.0.1 |
 | <a name="module_service_accounts"></a> [service\_accounts](#module\_service\_accounts) | terraform-google-modules/service-accounts/google | 4.2.0 |
-| <a name="module_vpcs"></a> [vpcs](#module\_vpcs) | terraform-google-modules/network/google | 6.0.0 |
+| <a name="module_vpcs"></a> [vpcs](#module\_vpcs) | terraform-google-modules/network/google | 6.0.1 |
 
 ## Resources
 
