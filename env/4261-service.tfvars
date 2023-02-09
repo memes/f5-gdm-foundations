@@ -1,6 +1,5 @@
-tf_sa_email = "terraform@f5-gcs-4261-sales-shrdvpc.iam.gserviceaccount.com"
-project_id  = "f5-gcs-4261-sales-shrdvpc"
-prefix      = "emes"
+project_id = "f5-gcs-4261-sales-shrdvpc"
+prefix     = "emes"
 labels = {
   owner     = "emes"
   retention = "none"
