@@ -149,3 +149,32 @@ module "bastion" {
     priority         = null
   }
 }
+
+# Add a backend service for quick testing
+module "backend" {
+  for_each       = merge(flatten([for k, v in module.vpcs : { for k1, v1 in v.subnets : v1.name => v1.self_link } if k == "internal"])...)
+  source         = "github.com/f5devcentral/f5-digital-customer-engagement-center//modules/google/terraform/backend/"
+  gcpProjectId   = var.project_id
+  projectPrefix  = ""
+  buildSuffix    = ""
+  name           = each.key
+  subnet         = each.value
+  public_address = true
+  labels = {
+    prefix = var.prefix
+  }
+}
+
+# Add a FW rule to allow BIG-IP to backend on internal network
+resource "google_compute_firewall" "backend" {
+  project                 = var.project_id
+  name                    = format("%s-allow-bigip-internal", var.prefix)
+  network                 = module.vpcs["internal"].network_self_link
+  source_service_accounts = formatlist("%s-%s@%s.iam.gserviceaccount.com", var.prefix, var.service_accounts, var.project_id)
+  allow {
+    protocol = "TCP"
+    ports = [
+      80,
+    ]
+  }
+}

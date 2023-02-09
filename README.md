@@ -17,6 +17,7 @@ Setup Service Accounts and VPCs for testing GDM templates.
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_backend"></a> [backend](#module\_backend) | github.com/f5devcentral/f5-digital-customer-engagement-center//modules/google/terraform/backend/ | n/a |
 | <a name="module_bastion"></a> [bastion](#module\_bastion) | memes/private-bastion/google | 2.2.1 |
 | <a name="module_cfe_role"></a> [cfe\_role](#module\_cfe\_role) | memes/f5-bigip/google//modules/cfe-role | 2.1.0 |
 | <a name="module_cloud_router"></a> [cloud\_router](#module\_cloud\_router) | terraform-google-modules/cloud-router/google | 4.0.0 |
@@ -28,6 +29,7 @@ Setup Service Accounts and VPCs for testing GDM templates.
 
 | Name | Type |
 |------|------|
+| [google_compute_firewall.backend](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
 | [google_project_iam_member.gdm_iam_admin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [random_string.password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [google_project.project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
