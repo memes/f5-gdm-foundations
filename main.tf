@@ -136,7 +136,7 @@ module "bastion" {
     cidrs  = module.vpcs[pair[1]].subnets_ips
   } }
   source                = "memes/private-bastion/google"
-  version               = "2.2.1"
+  version               = "2.3.3"
   project_id            = var.project_id
   prefix                = each.value.prefix
   subnet                = each.value.subnet
