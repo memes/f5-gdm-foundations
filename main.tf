@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.0"
+  required_version = ">= 1.2"
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -52,47 +52,28 @@ module "cfe_role" {
   members     = formatlist("serviceAccount:%s-%s@%s.iam.gserviceaccount.com", var.prefix, local.cfe_service_accounts, var.project_id)
 }
 
-locals {
-  short_regions = { for region in var.regions : region =>
-    join("", regex("^([^-]{2})[^-]*(-)([^1-9]{2})[^1-9]*([1-9])$", replace(replace(replace(replace(region, "/^northamerica/", "na"), "/^southamerica/", "sa"), "/southeast/", "se"), "/northeast/", "ne")))
-  }
-}
-
 module "vpcs" {
-  for_each                               = { for k, v in var.vpcs : k => v if v != null }
-  source                                 = "terraform-google-modules/network/google"
-  version                                = "6.0.1"
-  project_id                             = var.project_id
-  network_name                           = format("%s-gdm-%s", var.prefix, each.key)
-  description                            = format("%s VPC for GDM testing (%s)", var.prefix, title(each.key))
-  delete_default_internet_gateway_routes = false
-  mtu                                    = each.value.mtu
-  subnets = [for region in var.regions :
-    {
-      subnet_name           = format("%s-gdm-%s-%s", var.prefix, each.key, local.short_regions[region])
-      subnet_ip             = cidrsubnet(each.value.cidr, each.value.subnet_size - tonumber(split("/", each.value.cidr)[1]), index(var.regions, region))
-      subnet_region         = region
-      subnet_private_access = false
-    }
-  ]
-}
-
-module "cloud_router" {
-  for_each = { for pair in setproduct(slice(var.regions, 0, 1), [for k, v in var.vpcs : k if v != null && lookup(coalesce(v, {}), "nat", false)]) : join("-", pair) => {
-    name    = format("%s-gdm-%s-%s", var.prefix, pair[1], local.short_regions[pair[0]])
-    region  = pair[0]
-    network = module.vpcs[pair[1]].network_self_link
-  } }
-  source  = "terraform-google-modules/cloud-router/google"
-  version = "4.0.0"
-  project = var.project_id
-  name    = each.value.name
-  network = each.value.network
-  region  = each.value.region
-
-  nats = [{
-    name = each.value.name
-  }]
+  for_each    = { for k, v in var.vpcs : k => v if v != null }
+  source      = "memes/multi-region-private-network/google"
+  version     = "1.0.1"
+  project_id  = var.project_id
+  name        = format("%s-gdm-%s", var.prefix, each.key)
+  description = format("%s VPC for GDM testing (%s)", var.prefix, title(each.key))
+  regions     = var.regions
+  cidrs = {
+    primary             = each.value.cidr
+    primary_subnet_size = each.value.subnet_size
+    secondaries         = {}
+  }
+  options = {
+    mtu                   = each.value.mtu
+    delete_default_routes = false
+    restricted_apis       = false
+    routing_mode          = "GLOBAL"
+    nat                   = each.value.nat
+    nat_tags              = null
+    flow_logs             = true # Keep compliant
+  }
 }
 
 resource "random_string" "password" {
@@ -112,7 +93,7 @@ resource "random_string" "password" {
 # versioned secret.
 module "password" {
   source     = "memes/secret-manager/google"
-  version    = "2.0.1"
+  version    = "2.1.0"
   project_id = var.project_id
   id         = format("%s-gdm-bigip-password", var.prefix)
   secret     = random_string.password.result
@@ -129,22 +110,17 @@ resource "google_project_iam_member" "gdm_iam_admin" {
 
 # Add a bastion to each region in every VPC, as needed. Overkill.
 module "bastion" {
-  for_each = { for pair in setproduct(slice(var.regions, 0, 1), [for k, v in var.vpcs : k if v != null && lookup(coalesce(v, {}), "bastion", false)]) : join("-", pair) => {
-    prefix = format("%s-gdm-%s", var.prefix, local.short_regions[pair[0]])
-    zone   = format("%s-a", pair[0])
-    subnet = [for k, v in module.vpcs[pair[1]].subnets : v.self_link if length(regexall(format("^%s/", pair[0]), k)) > 0][0]
-    cidrs  = module.vpcs[pair[1]].subnets_ips
-  } }
+  for_each              = merge([for k, v in var.vpcs : module.vpcs[k].subnets if v != null && lookup(coalesce(v, {}), "bastion", false)]...)
   source                = "memes/private-bastion/google"
-  version               = "2.2.1"
+  version               = "2.3.3"
   project_id            = var.project_id
-  prefix                = each.value.prefix
-  subnet                = each.value.subnet
-  zone                  = each.value.zone
-  proxy_container_image = "us-docker.pkg.dev/f5-gcs-4138-sales-cloud-sales/automation-factory-container/memes/terraform-google-private-bastion/forward-proxy:2.1.0"
+  prefix                = replace(substr(each.key, 0, 22), "/[^a-z0-9]+$/", "")
+  subnet                = each.value.self_link
+  zone                  = format("%s-a", each.value.region)
+  proxy_container_image = var.forward_proxy_container
   bastion_targets = {
     service_accounts = null
-    cidrs            = each.value.cidrs
+    cidrs            = [each.value.primary_cidr]
     tags             = null
     priority         = null
   }
@@ -152,7 +128,7 @@ module "bastion" {
 
 # Add a backend service for quick testing
 module "backend" {
-  for_each       = merge(flatten([for k, v in module.vpcs : { for k1, v1 in v.subnets : v1.name => v1.self_link } if k == "internal"])...)
+  for_each       = merge(flatten([for k, v in module.vpcs : { for k1, v1 in v.subnets : k1 => v1.self_link } if k == "int"])...)
   source         = "github.com/f5devcentral/f5-digital-customer-engagement-center//modules/google/terraform/backend/"
   gcpProjectId   = var.project_id
   projectPrefix  = ""
@@ -165,11 +141,11 @@ module "backend" {
   }
 }
 
-# Add a FW rule to allow BIG-IP to backend on internal network
+# Add a FW rule to allow BIG-IP to backend on int network
 resource "google_compute_firewall" "backend" {
   project                 = var.project_id
-  name                    = format("%s-allow-bigip-internal", var.prefix)
-  network                 = module.vpcs["internal"].network_self_link
+  name                    = format("%s-allow-bigip-int", var.prefix)
+  network                 = module.vpcs["int"].self_link
   source_service_accounts = formatlist("%s-%s@%s.iam.gserviceaccount.com", var.prefix, var.service_accounts, var.project_id)
   allow {
     protocol = "TCP"

@@ -42,21 +42,21 @@ EOD
 
 variable "vpcs" {
   type = object({
-    external = object({
+    ext = object({
       cidr        = string
       subnet_size = number
       mtu         = number
       nat         = bool
       bastion     = bool
     })
-    management = object({
+    mgt = object({
       cidr        = string
       subnet_size = number
       mtu         = number
       nat         = bool
       bastion     = bool
     })
-    internal = object({
+    int = object({
       cidr        = string
       subnet_size = number
       mtu         = number
@@ -65,21 +65,21 @@ variable "vpcs" {
     })
   })
   default = {
-    external = {
+    ext = {
       cidr        = "172.16.0.0/16"
       subnet_size = 24
       mtu         = 1460
       nat         = true
       bastion     = false
     }
-    management = {
+    mgt = {
       cidr        = "172.17.0.0/16"
       subnet_size = 24
       mtu         = 1460
       nat         = true
       bastion     = true
     }
-    internal = {
+    int = {
       cidr        = "172.18.0.0/16"
       subnet_size = 24
       mtu         = 1460
@@ -101,5 +101,15 @@ variable "service_accounts" {
   description = <<EOD
 A set of names for which a generated service account will be created; any name
 that contains '-cfe-' will be granted a custom CFE role in the project.
+EOD
+}
+
+variable "forward_proxy_container" {
+  type        = string
+  default     = "ghcr.io/memes/terraform-google-private-bastion/forward-proxy:2.3.3"
+  description = <<EOD
+The forward-proxy container to use with bastion instances. The default value
+will pull from GitHub container registry but will fail if NAT gateway is not
+present. Set to an GAR or GCR copy for fully private access.
 EOD
 }
