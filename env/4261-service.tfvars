@@ -7,15 +7,15 @@ labels = {
 # For shared VPC service projects, nic0 must be in host project; only create two
 # VPC networks.
 vpcs = {
-  external = null
-  management = {
+  ext = null
+  mgt = {
     cidr        = "172.17.0.0/16"
     subnet_size = 24
     mtu         = 1460
     bastion     = false
     nat         = false
   }
-  internal = {
+  int = {
     cidr        = "172.18.0.0/16"
     subnet_size = 24
     mtu         = 1460
