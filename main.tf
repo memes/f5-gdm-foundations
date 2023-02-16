@@ -154,3 +154,18 @@ resource "google_compute_firewall" "backend" {
     ]
   }
 }
+
+# Add a FW rule to allow ingress to BIG-IP on ext network
+resource "google_compute_firewall" "public" {
+  project                 = var.project_id
+  name                    = format("%s-allow-bigip-ext", var.prefix)
+  network                 = module.vpcs["ext"].self_link
+  source_service_accounts = formatlist("%s-%s@%s.iam.gserviceaccount.com", var.prefix, var.service_accounts, var.project_id)
+  allow {
+    protocol = "TCP"
+    ports = [
+      80,
+      443,
+    ]
+  }
+}
