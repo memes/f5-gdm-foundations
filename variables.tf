@@ -1,13 +1,3 @@
-variable "tf_sa_email" {
-  type        = string
-  default     = ""
-  description = <<EOD
-The fully-qualified email address of the Terraform service account to use for
-resource creation. E.g.
-tf_sa_email = "terraform@PROJECT_ID.iam.gserviceaccount.com"
-EOD
-}
-
 variable "project_id" {
   type        = string
   description = <<EOD
@@ -111,5 +101,25 @@ variable "forward_proxy_container" {
 The forward-proxy container to use with bastion instances. The default value
 will pull from GitHub container registry but will fail if NAT gateway is not
 present. Set to an GAR or GCR copy for fully private access.
+EOD
+}
+
+variable "admin_password" {
+  type        = string
+  description = <<EOD
+The password to store in Google Secret Manager for use by BIG-IP onboarding
+scripts.
+EOD
+}
+
+variable "ingress_cidrs" {
+  type = list(string)
+  default = [
+    "0.0.0.0/0",
+  ]
+  description = <<EOD
+A list of CIDRs that will be used as the source ranges in a firewall rule to
+allow ingress to the BIG-IP service accounts. Default is ["0.0.0.0/0"], set to
+an empty list to prevent firewall rule creation.
 EOD
 }

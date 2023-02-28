@@ -5,30 +5,6 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 4.0"
     }
-    http = {
-      source  = "hashicorp/http"
-      version = ">= 3.2"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.3"
-    }
-  }
-  # Set the bucket and path in .config file
-  backend "gcs" {}
-}
-
-provider "google" {
-  impersonate_service_account = var.tf_sa_email
-}
-
-data "http" "my_address" {
-  url = "https://checkip.amazonaws.com"
-  lifecycle {
-    postcondition {
-      condition     = self.status_code == 200
-      error_message = "Failed to get local IP address"
-    }
   }
 }
 
@@ -37,11 +13,12 @@ data "google_project" "project" {
 }
 
 locals {
-  cfe_service_accounts  = [for sa in var.service_accounts : sa if length(regexall("-cfe-", sa)) > 0]
+  cfe_service_accounts  = try([for sa in var.service_accounts : sa if length(regexall("-cfe-", sa)) > 0], [])
   agent_service_account = format("%s@cloudservices.gserviceaccount.com", data.google_project.project.number)
 }
 
 module "service_accounts" {
+  count       = try(length(var.service_accounts), 0) > 0 ? 1 : 0
   source      = "terraform-google-modules/service-accounts/google"
   version     = "4.2.0"
   project_id  = var.project_id
@@ -89,19 +66,6 @@ module "vpcs" {
   }
 }
 
-resource "random_string" "password" {
-  length           = 16
-  upper            = true
-  min_upper        = 2
-  lower            = true
-  min_lower        = 2
-  numeric          = true
-  min_numeric      = 2
-  special          = true
-  min_special      = 2
-  override_special = "!@#$%&*()-_=+[]{}<>:?"
-}
-
 # CST 2.0 templates have support for secret manager; create a random password as
 # versioned secret.
 module "password" {
@@ -109,7 +73,7 @@ module "password" {
   version    = "2.1.1"
   project_id = var.project_id
   id         = format("%s-gdm-bigip-password", var.prefix)
-  secret     = random_string.password.result
+  secret     = var.admin_password
 }
 
 # CST 2.0 templates create roles as needed; make sure the GCP Agent service account
@@ -156,6 +120,7 @@ module "backend" {
 
 # Add a FW rule to allow BIG-IP to backend on int network
 resource "google_compute_firewall" "backend" {
+  count                   = try(length(var.service_accounts), 0) > 0 && lookup(var.vpcs, "int", null) != null ? 1 : 0
   project                 = var.project_id
   name                    = format("%s-allow-bigip-int", var.prefix)
   network                 = module.vpcs["int"].self_link
@@ -170,12 +135,11 @@ resource "google_compute_firewall" "backend" {
 
 # Add a FW rule to allow ingress to BIG-IP on ext network
 resource "google_compute_firewall" "public" {
-  project = var.project_id
-  name    = format("%s-allow-bigip-ext", var.prefix)
-  network = module.vpcs["ext"].self_link
-  source_ranges = [
-    format("%s/32", trimspace(data.http.my_address.response_body)),
-  ]
+  count                   = try(length(var.ingress_cidrs), 0) > 0 && try(length(var.service_accounts), 0) > 0 && lookup(var.vpcs, "ext", null) != null ? 1 : 0
+  project                 = var.project_id
+  name                    = format("%s-allow-bigip-ext", var.prefix)
+  network                 = module.vpcs["ext"].self_link
+  source_ranges           = var.ingress_cidrs
   target_service_accounts = formatlist("%s-%s@%s.iam.gserviceaccount.com", var.prefix, var.service_accounts, var.project_id)
   allow {
     protocol = "TCP"
