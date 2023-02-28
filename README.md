@@ -11,6 +11,7 @@ Setup Service Accounts and VPCs for testing GDM templates.
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 4.0 |
+| <a name="requirement_http"></a> [http](#requirement\_http) | >= 3.2 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.3 |
 
 ## Modules
@@ -33,6 +34,7 @@ Setup Service Accounts and VPCs for testing GDM templates.
 | [google_project_iam_member.gdm_iam_admin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [random_string.password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [google_project.project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
+| [http_http.my_address](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
 ## Inputs
 

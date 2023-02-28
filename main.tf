@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 4.0"
     }
+    http = {
+      source  = "hashicorp/http"
+      version = ">= 3.2"
+    }
     random = {
       source  = "hashicorp/random"
       version = ">= 3.3"
@@ -18,6 +22,15 @@ provider "google" {
   impersonate_service_account = var.tf_sa_email
 }
 
+data "http" "my_address" {
+  url = "https://checkip.amazonaws.com"
+  lifecycle {
+    postcondition {
+      condition     = self.status_code == 200
+      error_message = "Failed to get local IP address"
+    }
+  }
+}
 
 data "google_project" "project" {
   project_id = var.project_id
@@ -157,10 +170,13 @@ resource "google_compute_firewall" "backend" {
 
 # Add a FW rule to allow ingress to BIG-IP on ext network
 resource "google_compute_firewall" "public" {
-  project                 = var.project_id
-  name                    = format("%s-allow-bigip-ext", var.prefix)
-  network                 = module.vpcs["ext"].self_link
-  source_service_accounts = formatlist("%s-%s@%s.iam.gserviceaccount.com", var.prefix, var.service_accounts, var.project_id)
+  project = var.project_id
+  name    = format("%s-allow-bigip-ext", var.prefix)
+  network = module.vpcs["ext"].self_link
+  source_ranges = [
+    format("%s/32", trimspace(data.http.my_address.response_body)),
+  ]
+  target_service_accounts = formatlist("%s-%s@%s.iam.gserviceaccount.com", var.prefix, var.service_accounts, var.project_id)
   allow {
     protocol = "TCP"
     ports = [
