@@ -93,7 +93,7 @@ resource "random_string" "password" {
 # versioned secret.
 module "password" {
   source     = "memes/secret-manager/google"
-  version    = "2.1.0"
+  version    = "2.1.1"
   project_id = var.project_id
   id         = format("%s-gdm-bigip-password", var.prefix)
   secret     = random_string.password.result
