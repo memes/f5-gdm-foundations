@@ -51,9 +51,10 @@ module "vpcs" {
   description = format("%s VPC for GDM testing (%s)", var.prefix, title(each.key))
   regions     = var.regions
   cidrs = {
-    primary             = each.value.cidr
-    primary_subnet_size = each.value.subnet_size
-    secondaries         = {}
+    primary_ipv4_cidr        = each.value.cidr
+    primary_ipv4_subnet_size = each.value.subnet_size
+    primary_ipv6_cidr        = null
+    secondaries              = {}
   }
   options = {
     mtu                   = each.value.mtu
@@ -63,6 +64,8 @@ module "vpcs" {
     nat                   = each.value.nat
     nat_tags              = null
     flow_logs             = true # Keep compliant
+    ipv6_ula              = false
+    nat_logs              = true # Keep compliant
   }
 }
 
@@ -87,7 +90,7 @@ resource "google_project_iam_member" "gdm_iam_admin" {
 
 # Add a bastion to each region in every VPC, as needed. Overkill.
 module "bastion" {
-  for_each              = merge([for k, v in var.vpcs : module.vpcs[k].subnets if v != null && lookup(coalesce(v, {}), "bastion", false)]...)
+  for_each              = merge([for k, v in var.vpcs : module.vpcs[k].subnets_by_name if v != null && lookup(coalesce(v, {}), "bastion", false)]...)
   source                = "memes/private-bastion/google"
   version               = "2.3.3"
   project_id            = var.project_id
@@ -97,7 +100,7 @@ module "bastion" {
   proxy_container_image = var.forward_proxy_container
   bastion_targets = {
     service_accounts = null
-    cidrs            = [each.value.primary_cidr]
+    cidrs            = [each.value.primary_ipv4_cidr]
     tags             = null
     priority         = null
   }
@@ -105,7 +108,7 @@ module "bastion" {
 
 # Add a backend service for quick testing
 module "backend" {
-  for_each       = merge(flatten([for k, v in module.vpcs : { for k1, v1 in v.subnets : k1 => v1.self_link } if k == "int"])...)
+  for_each       = merge(flatten([for k, v in module.vpcs : { for k1, v1 in v.subnets_by_name : k1 => v1.self_link } if k == "int"])...)
   source         = "github.com/f5devcentral/f5-digital-customer-engagement-center//modules/google/terraform/backend/"
   gcpProjectId   = var.project_id
   projectPrefix  = ""
