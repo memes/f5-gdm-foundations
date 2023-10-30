@@ -20,7 +20,7 @@ locals {
 module "service_accounts" {
   count       = try(length(var.service_accounts), 0) > 0 ? 1 : 0
   source      = "terraform-google-modules/service-accounts/google"
-  version     = "4.2.1"
+  version     = "4.2.2"
   project_id  = var.project_id
   prefix      = var.prefix
   names       = var.service_accounts
