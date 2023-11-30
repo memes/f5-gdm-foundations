@@ -36,7 +36,7 @@ module "service_accounts" {
 module "cfe_role" {
   count       = length(local.cfe_service_accounts) > 0 ? 1 : 0
   source      = "memes/f5-bigip-cfe-role/google"
-  version     = "1.0.2"
+  version     = "1.0.3"
   target_type = "project"
   target_id   = var.project_id
   members     = formatlist("serviceAccount:%s-%s@%s.iam.gserviceaccount.com", var.prefix, local.cfe_service_accounts, var.project_id)
