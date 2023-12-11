@@ -45,7 +45,7 @@ module "cfe_role" {
 module "vpcs" {
   for_each    = { for k, v in var.vpcs : k => v if v != null }
   source      = "memes/multi-region-private-network/google"
-  version     = "2.0.0"
+  version     = "2.1.0"
   project_id  = var.project_id
   name        = format("%s-gdm-%s", var.prefix, each.key)
   description = format("%s VPC for GDM testing (%s)", var.prefix, title(each.key))
