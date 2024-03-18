@@ -92,7 +92,7 @@ resource "google_project_iam_member" "gdm_iam_admin" {
 module "bastion" {
   for_each              = merge([for k, v in var.vpcs : module.vpcs[k].subnets_by_name if v != null && lookup(coalesce(v, {}), "bastion", false)]...)
   source                = "memes/private-bastion/google"
-  version               = "2.3.5"
+  version               = "3.0.0"
   project_id            = var.project_id
   prefix                = replace(substr(each.key, 0, 22), "/[^a-z0-9]+$/", "")
   subnet                = each.value.self_link
