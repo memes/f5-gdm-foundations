@@ -45,16 +45,18 @@ module "cfe_role" {
 module "vpcs" {
   for_each    = { for k, v in var.vpcs : k => v if v != null }
   source      = "memes/multi-region-private-network/google"
-  version     = "2.1.0"
+  version     = "3.0.0"
   project_id  = var.project_id
   name        = format("%s-gdm-%s", var.prefix, each.key)
   description = format("%s VPC for GDM testing (%s)", var.prefix, title(each.key))
   regions     = var.regions
   cidrs = {
-    primary_ipv4_cidr        = each.value.cidr
-    primary_ipv4_subnet_size = each.value.subnet_size
-    primary_ipv6_cidr        = null
-    secondaries              = {}
+    primary_ipv4_cidr          = each.value.cidr
+    primary_ipv4_subnet_size   = each.value.subnet_size
+    primary_ipv4_subnet_offset = 0
+    primary_ipv4_subnet_step   = 1
+    primary_ipv6_cidr          = null
+    secondaries                = {}
   }
   options = {
     mtu                   = each.value.mtu
