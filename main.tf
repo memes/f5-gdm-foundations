@@ -51,10 +51,12 @@ module "vpcs" {
   description = format("%s VPC for GDM testing (%s)", var.prefix, title(each.key))
   regions     = var.regions
   cidrs = {
-    primary_ipv4_cidr        = each.value.cidr
-    primary_ipv4_subnet_size = each.value.subnet_size
-    primary_ipv6_cidr        = null
-    secondaries              = {}
+    primary_ipv4_cidr          = each.value.cidr
+    primary_ipv4_subnet_size   = each.value.subnet_size
+    primary_ipv4_subnet_offset = 0
+    primary_ipv4_subnet_step   = 1
+    primary_ipv6_cidr          = null
+    secondaries                = {}
   }
   options = {
     mtu                   = each.value.mtu
