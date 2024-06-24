@@ -19,7 +19,7 @@ Setup Service Accounts and VPCs for testing GDM templates.
 | <a name="module_backend"></a> [backend](#module\_backend) | github.com/f5devcentral/f5-digital-customer-engagement-center//modules/google/terraform/backend/ | n/a |
 | <a name="module_bastion"></a> [bastion](#module\_bastion) | memes/private-bastion/google | 3.0.1 |
 | <a name="module_cfe_role"></a> [cfe\_role](#module\_cfe\_role) | memes/f5-bigip-cfe-role/google | 1.0.3 |
-| <a name="module_password"></a> [password](#module\_password) | memes/secret-manager/google | 2.2.0 |
+| <a name="module_password"></a> [password](#module\_password) | memes/secret-manager/google | 2.2.1 |
 | <a name="module_service_accounts"></a> [service\_accounts](#module\_service\_accounts) | terraform-google-modules/service-accounts/google | 4.2.3 |
 | <a name="module_vpcs"></a> [vpcs](#module\_vpcs) | memes/multi-region-private-network/google | 3.0.0 |
 
