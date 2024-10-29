@@ -2,6 +2,8 @@
 
 Setup Service Accounts and VPCs for testing GDM templates.
 
+> NOTE: This repo is no longer actively maintained.
+
 <!-- spell-checker: ignore markdownlint -->
 <!-- markdownlint-disable no-inline-html -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
